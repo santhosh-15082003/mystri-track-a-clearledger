@@ -1,10 +1,10 @@
 # Handover
 
-- Name: Applicant
-- Email used for this application: applicant@example.com
+- Name: Santhosh B
+- Email used for this application: santhoshb1503@gmail.com
 - Chosen track: Track A — Repair the register
-- Why this track: I selected Track A because diagnosing root causes in financial ledgers and building rock-solid regression verification is where software quality creates the highest business trust.
-- Approximate total time, including setup and handover: ~3.5 hours
+- Why this track: I selected Track A because diagnosing root causes in financial ledgers and building rock-solid regression verification is where software quality creates the highest business trust and i am a full stack developer so i can easily understand the problem and give the perfect solution.
+- Approximate total time, including setup and handover: 3 hours 50 minutes (includes the time spent on understanding the project and the test cases, the test coverage, application and business logic and etc.. and also the time taken for the repair of the 6 defects and the separate improvement I have made to the application).
 
 ## Run and verify
 
@@ -23,9 +23,11 @@ D:\python.exe app.py
 ```
 
 Expected Output from Test Suite:
+
 - `Ran 26 tests in ~0.8s -> OK` (covers all 6 repaired defects and customer aggregates).
 
 Expected State on Fixture Restore:
+
 - Invoices: 9 | Open: 7 | Outstanding: INR 3,698.19 | Unmatched payments: 1 (`KEEP-U1` · MAPLE / WAIT-900 · INR 33.33).
 
 ## What I delivered
@@ -62,6 +64,7 @@ Diagnosed and resolved all 6 seeded defects in the ClearLedger application, and 
 ## Evidence and limits
 
 ### 1. Failing-Before / Passing-After Reproduction (Defect 1)
+
 - **Buggy Code**: Scanned all invoices for `amount == payment['amount']` before checking identity.
 - **Failing-Before Run** (`test_same_amount_different_customer` in `tests/test_matching.py`):
   Payment for `MAPLE / INV-200` (1250.00) incorrectly returned invoice ID 1 (`HARBOR / INV-100`) because both invoices had amount 1250.00.
@@ -69,17 +72,20 @@ Diagnosed and resolved all 6 seeded defects in the ClearLedger application, and 
 - **Passing-After Run**: Looked up `(customer_id, invoice_number)` directly. Returns invoice ID 2 (`MAPLE`). Test passes with `OK`.
 
 ### 2. Changed-Input Case
+
 - **Test Case**: `test_custom_case_mixed_batch` in `tests/test_invoices.py`.
 - **Input**: 3-line invoice CSV containing 1 new invoice (`NORTH/INV-NEW`), 1 identical duplicate (`MAPLE/INV-200`), and 1 conflicting duplicate (`HARBOR/INV-100` with 2000.00 instead of 1250.00).
 - **Expected**: `imported: 1, skipped: 1, rejected: 1`.
 - **Observed Result**: Exactly `{'imported': 1, 'skipped': 1, 'rejected': 1}`, and database preserved `HARBOR/INV-100` at 1250.00.
 
 ### 3. Existing-Register Check
+
 - Restored `fixtures/existing-register.sqlite3` via `restore_fixture.py --replace`.
 - Verified starting state: exactly 9 invoices, 5 payments, 7 open, INR 3,698.19 outstanding, and 1 unmatched payment (`KEEP-U1`).
 - Verified new invoice/payment imports succeed against restored database and survive restart.
 
 ### 4. Known Limits & Next Highest-Value Step
+
 - **Known Limit**: Unmatched payments are preserved as specified but not automatically rematched if the matching invoice is imported later (per scope).
 - **Next Step**: Implement a manual payment allocation re-assignment modal in the UI allowing operators to link unmatched payments to newly created invoices.
 
